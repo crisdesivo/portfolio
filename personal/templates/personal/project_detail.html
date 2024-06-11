@@ -1,0 +1,13 @@
+{% extends 'personal/base.html' %}
+
+{% block title %}My Portfolio{% endblock %}
+
+{% block content %}
+    <h1>{{ project.title }}</h1>
+    <md-block>{{ project.markdown }}</md-block>
+    {% if project.link %}
+        <a href="{{ project.link }}" class="btn btn-primary">View Project</a>
+    {% endif %}
+{% endblock %}
+
+
