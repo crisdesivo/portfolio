@@ -11,3 +11,7 @@ def project_detail(request, pk):
 def home(request):
     projects = Project.objects.all()
     return render(request, 'personal/home.html', {'projects': projects})
+
+# hire me page
+def hire_me(request):
+    return render(request, 'personal/hire_me.html', {})
