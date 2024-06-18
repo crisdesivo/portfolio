@@ -3,25 +3,29 @@
 {% block title %}Cristian Desivo{% endblock %}
 
 {% block content %}
+<!-- disclaimer about website being a work in progress -->
+<div class="alert alert-warning" role="alert">
+    This website is a work in progress. Check back soon for more updates!
+</div>
     <!-- about me subtitle -->
     <h1 class="my-4">Cristian Desivo</h1>
-    <a href="https://www.freelancer.com/affiliates/email/18225913/"><img src="https://cdn3.f-cdn.com/ppic/120595756/logo/18225913/profile_logo_18225913.jpg" style="float: left; margin-right: 20px; margin-bottom:10px; width:100px; max-height: 100px; border-radius: 50%;"></a>
+    <a href="https://www.freelancer.com/affiliates/email/18225913/" target="_blank" rel="noopener noreferrer"><img src="https://cdn3.f-cdn.com/ppic/120595756/logo/18225913/profile_logo_18225913.jpg" style="float: left; margin-right: 20px; margin-bottom:10px; width:100px; max-height: 100px; border-radius: 50%;"></a>
 
-    <p class="lead">I'm a mathematician a python expert and an AI developer. I've been working as a freelance developer since 2016, mastering the art of mathematical optimization, python and AI.</p>
+    <p class="lead">I'm a mathematician, a python expert and an AI developer. I've been working as a freelance developer since 2016, mastering the art of mathematical optimization, python and AI.</p>
     
-    <p class="lead">Check out the summaries of some of the projects I've worked on below, send me an email at <a href="mailto:cdesivo92@gmail.com">cdesivo92@gmail.com</a>, or hire me on <a href="https://www.freelancer.com/affiliates/email/18225913/">freelancer.com</a></p>
-    <div class="row">
-        <div class="col-lg-6">
-            <a href="{% url 'hire_me' %}" class="btn btn-primary">Hire me</a>
-        </div>
-    </div>
+    <p class="lead">Check out the summaries of some of the projects I've worked on below, send me an email at <a href="mailto:cdesivo92@gmail.com">cdesivo92@gmail.com</a>, or hire me on <a href="https://www.freelancer.com/affiliates/email/18225913/" target="_blank" rel="noopener noreferrer">freelancer.com</a></p>
+    <!-- <div class="row"> -->
+        <!-- <div class="col-lg-6"> -->
+            <a href="https://www.freelancer.com/affiliates/email/18225913/" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Hire me</a>
+        <!-- </div> -->
+    <!-- </div> -->
 
     <!-- past projects as cards -->
     <h1 class="my-4">Past projects</h1>
-    <div class="card-columns">
+    <div class="bricklayer">
         {% for project in projects %}
-            <!-- <div class="col-lg-4 col-sm-6 mb-4"> -->
-                <div class="card bg-light mb-4 shadow-sm">
+            <!-- div of width 30% of screen -->
+                <div class="card bg-light mb-4 shadow-sm" style="width: 30%;">
                     {% if project.image %}
                         <img class="card-img-top" src="{{ project.image.url }}" alt="{{ project.title }}">
                     {% endif %}
@@ -29,7 +33,7 @@
                         <h4 class="card-title">{{ project.title }}</h4>
                         <md-block class="card-text">{{ project.description }}</md-block>
                         {% if project.link %}
-                            <a href="{{ project.link }}" class="btn btn-secondary">View Project</a>
+                            <a href="{{ project.link }}" class="btn btn-secondary">Visit Project Website</a>
                         {% endif %}
                         <a href="{% url 'project_detail' project.id %}" class="btn btn-primary">View Details</a>
                     </div>

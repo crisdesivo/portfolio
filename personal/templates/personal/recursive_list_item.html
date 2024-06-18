@@ -1,0 +1,19 @@
+<li>
+    <!-- add button to collapse -->
+    <button class="btn btn-link" data-toggle="collapse" data-target="#id-{{ element.id }}"><</button>
+    {{ element.title }}
+    <!-- add div collapsed if {{element.collapsed}} -->
+    <div id="id-{{ element.id }}" class="collapse{% if not element.collapsed %} show{% endif %}">
+        <!-- {{ element.description }} -->
+        <ul style="list-style-type: none">
+            {% for child in element.children.all %}
+                {% include 'personal/recursive_list_item.html' with element=child %}
+            {% endfor %}
+            <button class="btn btn-link" onclick="add_child('{{ element.id }}')">+</button>
+        </ul>
+    </div>
+    <!-- add button to add child, calling python function called add_child -->
+    <!-- <ul>
+        <button class="btn btn-link" onclick="add_child('{{ element.name }}')">+</button>
+    </ul> -->
+</li>

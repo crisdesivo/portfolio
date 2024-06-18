@@ -1,0 +1,57 @@
+{% extends 'personal/base.html' %}
+
+{% block title %}My list{% endblock %}
+
+{% block content %}
+<script>
+    // TODO load lists from python, then update the lists with javascript and periodically update the lists with ajax
+    function add_child(parent_id) {
+        // get name and description from user
+        const name = 'new element';
+        const description = 'description';
+        // get parent id
+        const parentId = parent_id;
+        $.ajax({
+                type: 'POST',
+                url: '{% url "add_child" %}',
+                data: {
+                    'title': name,
+                    'description': description,
+                    'parent': parentId,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        location.reload();
+                    } else {
+                        alert('Error adding child.');
+                    }
+                }
+            });
+        // // find element with id id-parent_id
+        // var parent = document.getElementById('id-' + parent_id);
+        // // find parent ul element
+        // var parent_ul = parent.getElementsByTagName('ul')[0];
+        // // use the template to create a new element
+        // var new_element = document.createElement('li');
+        // // get new id by calling python function new_id
+        // new_element.innerHTML = `
+        //     <button class="btn btn-link" data-toggle="collapse" data-target="#id-${new_id}"><</button>
+        //     <span>new element</span>
+        //     <div id="id-${new_id}" class="collapse">
+        //         <ul style="list-style-type: none">
+        //             <button class="btn btn-link" onclick="add_child('${new_id}')">+</button>
+        //         </ul>
+        //     </div>
+        // `;
+        // // append new element to parent ul
+        // parent_ul.appendChild(new_element);
+    }
+</script>
+<h1>Recursive List</h1>
+<ul style="list-style-type: none">
+    {% for element in root_elements %}
+        {% include 'personal/recursive_list_item.html' with element=element %}
+    {% endfor %}
+</ul>
+{% endblock %}
