@@ -6,8 +6,14 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 ADD ./portfolio /app
 WORKDIR /app
 
+ARG PORT=8000
+EXPOSE ${PORT}
 
-EXPOSE 8000
+# Add the start script to the working directory
+ADD ./start.sh /app/start.sh
 
+# Make the start script executable
+RUN chmod +x /app/start.sh
 
-CMD ["gunicorn", "--bind", ":8000", "CristianDesivo.wsgi:application"]
+CMD ["/app/start.sh"]
+# CMD ["gunicorn", "--bind", ${PORT:-8000}, "CristianDesivo.wsgi:application"]
