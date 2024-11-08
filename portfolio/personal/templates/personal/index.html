@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel P.I.</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background-color: #1c1c1c;
+            color: #f8f9fa;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .navbar {
+            background-color: #2e2e2e;
+        }
+        .banner {
+            width: 100%;
+            height: 50vh; /* Set a custom height relative to the viewport */
+            position: relative;
+            overflow: hidden;
+        }
+
+        .banner-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%; /* Ensures the image fills the width */
+            height: 100%; /* Maintains the aspect ratio */
+            object-fit: cover; /* Ensures the image covers the container while maintaining aspect ratio */
+            object-position: center; /* Centers the image within the container */
+        }
+
+        .banner .logo {
+            position: absolute; /* Positions the logo on top of the banner image */
+            top: 50%; /* Vertically centers the logo */
+            left: 50%; /* Horizontally centers the logo */
+            transform: translate(-50%, -50%); /* Adjusts the centering */
+            width: 40%; /* Adjust the size of the logo relative to the screen width */
+            height: auto;
+            /* keep aspect ratio */
+            min-width: 300px;
+
+        }
+        .content-section {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .main-character {
+            max-width: 350px;
+            margin-right: 20px;
+        }
+        .carousel-container {
+            flex-grow: 1;
+            margin-left: 20px;
+        }
+        .carousel-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+        .jumbotron {
+            background-color: #3c3c3c;
+            padding: 2rem;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .card {
+            background-color: #2e2e2e;
+            border: none;
+            border-radius: 10px;
+        }
+        .card img {
+            border-radius: 10px;
+        }
+        .btn-custom {
+            background-color: #4caf50;
+            color: white;
+        }
+        .btn-custom:hover {
+            background-color: #45a049;
+        }
+        footer {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #2e2e2e;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Banner Section -->
+    <div class="banner">
+        <img src="https://i.imgur.com/loG2gQS.png" alt="Banner Image" class="banner-image">
+        <img src="https://i.imgur.com/OT6oi1X.png" alt="Pixel P.I. Logo" class="logo">
+    </div>
+
+    <!-- Jumbotron -->
+    <div class="container">
+        <div class="jumbotron">
+            <h1 class="display-4">Welcome to Pixel P.I.</h1>
+            <p class="lead">Dive into a world of mystery, intrigue, and pixelated crime-solving.</p>
+            <hr class="my-4">
+            <p>Play now and solve the most challenging cases, one pixel at a time.</p>
+            <a class="btn btn-custom btn-lg" href="#" role="button">Start Your Investigation</a>
+        </div>
+    </div>
+
+    <!-- Content Section -->
+    <div class="container content-section">
+        <img src="https://i.imgur.com/XI8MoIJ.png" alt="Main Character" class="main-character"> <!-- Replace with main character image -->
+        <div class="carousel-container">
+            <div id="gameCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    <div class="carousel-item active">
+                        <img src="https://via.placeholder.com/600x400" alt="Screenshot 1">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://via.placeholder.com/600x400" alt="Screenshot 2">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://via.placeholder.com/600x400" alt="Screenshot 3">
+                    </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#gameCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#gameCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Cases Section -->
+    <div class="container mt-5">
+        <h2 class="mb-4 text-center">Featured Cases</h2>
+        <div class="row">
+            <!-- Placeholder for Game Cases -->
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <img src="https://via.placeholder.com/350x150" class="card-img-top" alt="Case Image">
+                    <div class="card-body">
+                        <h5 class="card-title">Case Title</h5>
+                        <p class="card-text">Brief description of the case.</p>
+                        <a href="#" class="btn btn-custom">Investigate</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Repeat above block for more cases -->
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 Pixel P.I. | All rights reserved.</p>
+        <p><a href="#" class="text-white">Privacy Policy</a> | <a href="#" class="text-white">Terms of Service</a></p>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
