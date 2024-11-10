@@ -1,3 +1,7 @@
 *.pyc
 */migrations
 */__pycache__
+test.py
+*.gguf
+*dockertest
+*staticfiles/
