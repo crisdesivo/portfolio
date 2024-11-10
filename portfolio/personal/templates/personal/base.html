@@ -28,6 +28,10 @@
             }
         }
     </style>
+    
+    {% load static %}
+    <link rel ="icon" sizes=16x16 href="{% static 'favicon.ico' %}" type="image/x-icon">
+
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -40,6 +44,9 @@
                 <!-- link to hire_me -->
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'hire_me' %}">Hire me</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'ask_question' %}">Question Answering DEMO</a>
                 </li>
             </ul>
         </div>
