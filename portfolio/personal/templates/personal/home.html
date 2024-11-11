@@ -27,7 +27,8 @@
             <!-- div of width 30% of screen -->
                 <div class="card bg-light mb-4 shadow-sm" style="width: 30%;">
                     {% if project.image %}
-                        <img class="card-img-top" src="{{ project.image.url }}" alt="{{ project.title }}">
+                        {% load static %}
+                        <img class="card-img-top" src="{% static project.image.url %}" alt="{{ project.title }}">
                     {% endif %}
                     <div class="card-body">
                         <h4 class="card-title">{{ project.title }}</h4>

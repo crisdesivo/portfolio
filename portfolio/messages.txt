@@ -1,0 +1,61 @@
+You will be shown a list of questions that Cristian answered before (QnA). Your task will be to select the most relevant item from the QnA to answer that question. If the question already exists in the QnA, you should select it. If not, you should select the most relevant question and answer pair that can be used to answer the given question.
+
+The answer should be a JSON object with the following fields:
+Requested_Information: The context of the question and what information the question is aiming to obtain from Cristian exactly.
+Eventual_answer: Based on the QnA, what do you think Cristian would answer to the given question?
+Question_and_Answer_From_QnA: Based on the extracted 'Requested_Information', return the verbatim question and answer from the QnA that provides the requested information by the given question, as an object with the fields "tags", "question", "question_number" and "answer". Each field MUST be an exact copy of the question and answer from the QnA, not a paraphrase.
+Is_answer_in_QnA: Whether the question was answered in the QnA or not (for example if the selected question and answer pair provides the information to answer the given question).
+
+List of questions (QnA):
+```[
+  {
+    "tags": "about_me",
+    "question": "Who are you?",
+    "question_number": 0,
+    "answer": "I am Cristian Desivo, a mathematician and software developer. I work as a freelancer."
+  },
+  {
+    "tags": "jobs mathematical_optimization AI_development",
+    "question": "What kind of jobs do you take?",
+    "question_number": 1,
+    "answer": "I have two main areas of expertise: Mathematical optimization and AI development."
+  },
+  {
+    "tags": "jobs mathematical_optimization",
+    "question": "What is mathematical optimization/jobs?",
+    "question_number": 2,
+    "answer": "Optimization problems require the understanding of a real-world problem, the mathematical modeling of it, and the development of algorithms to solve it."
+  },
+  {
+    "tags": "jobs AI_development",
+    "question": "What is AI development/jobs?",
+    "question_number": 3,
+    "answer": "AI development jobs include tasks from prompt engineering, machine learning, model fine-tuning, dataset creation, building applications around AI models, and more."
+  },
+  {
+    "tags": "freelancer",
+    "question": "What does it mean to be a freelancer?",
+    "question_number": 4,
+    "answer": "A freelancer is a self-employed person who offers services to bussinesses or individuals."
+  },
+  {
+    "tags": "rates",
+    "question": "How much do you charge for your services?",
+    "question_number": 5,
+    "answer": "My rates depend on the project. I usually charge per hour, but I can also charge per project. My hourly rate is $25. For example a basic AI integration in a website would cost between U$D100 and U$D400, depending on the complexity."
+  },
+  {
+    "tags": "programming languages",
+    "question": "What programming languages do you work with?",
+    "question_number": 6,
+    "answer": "I can work with any programming language, but most of my experience is with Python, C#, and JavaScript."
+  },
+  {
+    "tags": "python framework",
+    "question": "What Python frameworks do you work with?",
+    "question_number": 7,
+    "answer": "I work with web frameworks like Django, Flask, and FastAPI, data science frameworks like Pandas, NumPy, and Scikit-learn, and machine learning frameworks like TensorFlow and PyTorch. For optimization problems, I use SciPy, CVXPY, google OR-Tools, PyGad, PyMOO, among others."
+  }
+]```
+Understood, what's the question?
+Potential client Question: ```who are you?```

@@ -1,3 +1,6 @@
 Django==5.1.3
 gunicorn
 Pillow
+whitenoise
+git+https://github.com/crisdesivo/directRetrieval.git
+llama-cpp-python
