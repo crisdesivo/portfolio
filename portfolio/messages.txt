@@ -58,4 +58,4 @@ List of questions (QnA):
   }
 ]```
 Understood, what's the question?
-Potential client Question: ```who are you?```
+Potential client Question: ```what is a freelancer?```
