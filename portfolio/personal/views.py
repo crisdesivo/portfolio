@@ -9,7 +9,7 @@ from django.http import JsonResponse
 import sys
 from threading import Lock
 from directRetrieval.qna import QnAModel
-from directRetrieval.LLMInterfaces import LLamaCPP
+from directRetrieval.LLMInterfaces import LLamaCPP, OpenAISync
 
 # TODO use openai?
 # TODO upload to cloud run as is to test
@@ -59,6 +59,29 @@ def ask_question(request):
         print(question)
         with llmLock:
             answer = qnaModel.getAnswer(question)
+        print(answer)
         # return render(request, 'personal/answer-demo.html', {"last_question": question, "last_answer": answer})
+        return JsonResponse({"last_question": question, "last_answer": answer})
+    return render(request, 'personal/answer-demo.html', {"last_question": "", "last_answer": ""})
+
+def ask_question_openai(request):
+    # TODO add support in the front end for this
+    # TODO with valid and invalid api keys
+    # "Your API key will not be stored or saved in any way. It will only be used to answer this question."
+    if request.method == 'POST':
+        print(">>>>>>Using openai")
+        data = request.POST
+        llm = OpenAISync(data["api_key"])
+        qnaModel = QnAModel.fromConfig(llm, config)
+        question = data['question']
+        print(question)
+        with llmLock:
+            try:
+                answer = qnaModel.getAnswer(question)
+            except Exception as e:
+                print(e)
+                raise e
+                answer = ""
+        print(answer)
         return JsonResponse({"last_question": question, "last_answer": answer})
     return render(request, 'personal/answer-demo.html', {"last_question": "", "last_answer": ""})

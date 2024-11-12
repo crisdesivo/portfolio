@@ -27,6 +27,13 @@
                 width: 50%;
             }
         }
+
+        #main-content {
+            margin-top: 20px;
+            margin-left: 10px;
+            margin-right: 10px;
+            max-width: 98%;
+        }
     </style>
     
     {% load static %}
@@ -53,7 +60,7 @@
         </div>
     </nav>
     <!-- div container with margins -->
-    <div class="container" style="margin-top: 20px;">
+    <div class="container-fluid" id="main-content">
         {% block content %}{% endblock %}
     </div>
 </body>
