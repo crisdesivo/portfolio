@@ -1,38 +1,42 @@
 # Create your views here.
-from django.shortcuts import render
-from .models import Project
 import json
+import logging
 import os
+import re
+from functools import lru_cache
+
 from django.conf import settings
-from llama_cpp import Llama
 from django.http import JsonResponse
-import sys
-from threading import Lock
+from django.shortcuts import render
 from directRetrieval.qna import QnAModel
-from directRetrieval.LLMInterfaces import LLamaCPP, OpenAISync
 
-# TODO use openai?
-# TODO upload to cloud run as is to test
-# TODO then download from the script https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q5_k_m.gguf
-# TODO use llama_cpp python module to load the model
-# TODO add a view to interact with the model, a chat
-# Google Cloud Run supposedly has 8 GB of storage which should be enough for the 1.3 GB model
+from .llm import OpenRouterLLM, approved_answer
+from .models import Project
+from .orouter import OpenRouterError
 
-llmLock = Lock()
-ggufPath = os.path.join(settings.STATIC_ROOT, "qwen2.5-1.5b-instruct-q5_k_m.gguf")
-try:
-    llm = LLamaCPP(ggufPath, n_ctx=2500)
-except Exception as e:
-    print(f"Failed to load model from {ggufPath}")
-    print(e)
-    # sys.exit(1)
+log = logging.getLogger(__name__)
 
 # load file at static/cris.config
 crisConfigPath = os.path.join(settings.STATIC_ROOT, "cris.config")
 print(f"Loading cris config from {crisConfigPath}")
 config = json.load(open(crisConfigPath, 'r'))
 config['qna'] = os.path.join(settings.STATIC_ROOT, config['qna'])
-qnaModel = QnAModel.fromConfig(llm, config)
+
+# The demo asks a free OpenRouter model, picked at runtime (see llm.py).
+OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
+qnaModel = None
+if OPENROUTER_API_KEY:
+    llm = OpenRouterLLM(OPENROUTER_API_KEY)
+    qnaModel = QnAModel.fromConfig(llm, config)
+    llm.selector.warm_up()
+else:
+    print("OPENROUTER_API_KEY is not set: the question answering demo is disabled")
+
+
+@lru_cache(maxsize=512)
+def cached_answer(normalized_question: str) -> str:
+    # Exceptions are not cached, so a failed call is retried on the next ask.
+    return approved_answer(qnaModel, normalized_question)
 
 
 # make views for individual projects
@@ -53,35 +57,19 @@ def hire_me(request):
 
 def ask_question(request):
     if request.method == 'POST':
-        data = request.POST
-        print(data)
-        question = data['question']
-        print(question)
-        with llmLock:
-            answer = qnaModel.getAnswer(question)
-        print(answer)
-        # return render(request, 'personal/answer-demo.html', {"last_question": question, "last_answer": answer})
-        return JsonResponse({"last_question": question, "last_answer": answer})
-    return render(request, 'personal/answer-demo.html', {"last_question": "", "last_answer": ""})
-
-def ask_question_openai(request):
-    # TODO add support in the front end for this
-    # TODO with valid and invalid api keys
-    # "Your API key will not be stored or saved in any way. It will only be used to answer this question."
-    if request.method == 'POST':
-        print(">>>>>>Using openai")
-        data = request.POST
-        llm = OpenAISync(data["api_key"])
-        qnaModel = QnAModel.fromConfig(llm, config)
-        question = data['question']
-        print(question)
-        with llmLock:
-            try:
-                answer = qnaModel.getAnswer(question)
-            except Exception as e:
-                print(e)
-                raise e
-                answer = ""
-        print(answer)
+        question = request.POST.get('question', '').strip()
+        if not question:
+            return JsonResponse({"error": "Please type a question."}, status=400)
+        if qnaModel is None:
+            return JsonResponse({"error": "The demo is not configured right now."}, status=503)
+        normalized = re.sub(r"\s+", " ", question)[:500]
+        try:
+            answer = cached_answer(normalized)
+        except Exception:
+            log.exception("question answering failed")
+            return JsonResponse(
+                {"error": "The AI provider is busy right now. Please try again in a minute."},
+                status=503,
+            )
         return JsonResponse({"last_question": question, "last_answer": answer})
     return render(request, 'personal/answer-demo.html', {"last_question": "", "last_answer": ""})

@@ -5,17 +5,13 @@ RUN apk add build-base
 RUN apk add git
 
 RUN pip install --upgrade pip
-RUN pip install --no-cache-dir cmake==3.31.0.1 --default-timeout=100 future
 RUN pip install --no-cache-dir -r /app/requirements.txt --default-timeout=100 future
 
 ADD ./portfolio /app
 WORKDIR /app
 
-# download https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q5_k_m.gguf
-# and save it at /app/static/qwen2.5-1.5b-instruct-q5_k_m.gguf
-
-RUN apk add wget
-RUN wget https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct-GGUF/resolve/main/qwen2.5-1.5b-instruct-q5_k_m.gguf -O /app/static/qwen2.5-1.5b-instruct-q5_k_m.gguf
+# The QnA demo calls a free OpenRouter model, so no local model is downloaded.
+# It needs OPENROUTER_API_KEY set on the Cloud Run service (not baked in here).
 
 ARG PORT=8080
 EXPOSE ${PORT}

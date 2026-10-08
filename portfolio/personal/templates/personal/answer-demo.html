@@ -35,21 +35,6 @@
     .qa.none .a, .qa.err .a { font-style:italic; color:var(--muted); font-size:21px; }
     .qa.none .src, .qa.err .src { color:var(--warn); }
     .qa.none .src:before, .qa.err .src:before { background:none; }
-    .adv { margin-top:26px; font:15px/1.5 "Source Sans 3", sans-serif; color:var(--muted); }
-    .adv summary { cursor:pointer; color:var(--ink); font-weight:500; list-style:none; }
-    .adv summary::-webkit-details-marker { display:none; }
-    .adv summary:before { content:"+ "; color:var(--gold); }
-    .adv[open] summary:before { content:"− "; }
-    .adv .box { margin-top:14px; padding:18px 20px; background:var(--tint); border:1px solid var(--rule); }
-    .switch { display:flex; align-items:center; gap:10px; color:var(--ink); cursor:pointer; }
-    .switch input { appearance:none; width:34px; height:18px; border-radius:9px; background:#B9BDC6; position:relative; cursor:pointer; transition:background .2s; }
-    .switch input:after { content:""; position:absolute; left:2px; top:2px; width:14px; height:14px; border-radius:50%; background:var(--bg); transition:left .2s; }
-    .switch input:checked { background:var(--ink); }
-    .switch input:checked:after { left:18px; }
-    .key { display:none; margin-top:12px; }
-    .key.on { display:block; }
-    .key input { width:100%; border:1px solid var(--rule); background:var(--paper); padding:10px 12px; font:14px "Source Sans 3", sans-serif; }
-    .key small { display:block; margin-top:8px; font-size:13px; }
     aside.notes { font:14.5px/1.6 "Source Sans 3", sans-serif; color:var(--muted); }
     aside.notes h3 { font:600 12px/1 "Source Sans 3", sans-serif; letter-spacing:.18em; text-transform:uppercase; color:var(--ink); margin-bottom:16px; }
     aside .note { font-size:14.5px; margin:0 0 22px; }
@@ -100,17 +85,6 @@
             <div class="progress" id="progress"><span>Choosing among approved answers…</span><div class="bar"><i id="progressBar"></i></div></div>
 
             <div class="exchange" id="exchange"></div>
-
-            <details class="adv">
-                <summary>Advanced: run it with a larger model</summary>
-                <div class="box">
-                    <label class="switch"><input type="checkbox" id="useOpenAI"> Use the OpenAI API (gpt-4o-mini)</label>
-                    <div class="key" id="openaiKey">
-                        <input type="password" id="openaiApiKey" placeholder="Your OpenAI API key">
-                        <small>Your key is used for this question only. It is never stored.</small>
-                    </div>
-                </div>
-            </details>
         </form>
     </div>
 
@@ -119,6 +93,7 @@
         <div class="note"><b>What is this?</b>A question-answering demo using a language model, built on a retrieval system I designed. It picks the most fitting answer from a pre-written FAQ about me.</div>
         <div class="note"><b>Why no hallucinations?</b>The model chooses; it never writes. Every answer you see was written by me in advance.</div>
         <div class="note"><b>Why no prompt injection?</b>There is no free-form output to hijack. The worst a malicious prompt can do is read the wrong approved answer.</div>
+        <div class="note"><b>Which model?</b>A free model, picked automatically: the best-ranked free model on OpenRouter that passes a test proving it respects a strict output format. Free models come and go, so the choice is re-checked every few hours.</div>
         <div class="note"><b>Topics covered</b>
             <ul class="topics"><li>Who I am</li><li>The work I take on</li><li>Optimization &amp; AI development</li><li>Languages &amp; frameworks</li></ul>
         </div>
@@ -131,10 +106,10 @@
         <div class="steps">
             <div><h4>Question</h4><p>You type anything, in your own words.</p></div>
             <div><h4>Selection</h4><p>The model reads the approved question-and-answer pairs. Its output is constrained to one of them, plus a yes/no: does it really answer you? If not, nothing is shown.</p></div>
-            <div><h4>Answer</h4><p>The chosen answer is shown exactly as written. Nothing is generated.</p></div>
+            <div><h4>Answer</h4><p>The server checks the choice against the list, then shows that answer exactly as written. Nothing is generated.</p></div>
         </div>
         <div class="two faq">
-            <div><h4>Why am I still getting wrong answers?</h4><p>This demo runs a 1.5-billion-parameter model so it can be hosted cheaply; it sometimes picks a less fitting answer. A larger model, such as gpt-4o-mini, picks reliably.</p></div>
+            <div><h4>Why is an answer sometimes off, or slow?</h4><p>The demo runs on free models, which can queue for a few seconds and occasionally pick a less fitting answer. Even then, what you see is always one of my answers, never an invented one.</p></div>
             <div><h4>Where is this useful?</h4><p>Anywhere a wrong answer is costly: a business website's assistant, support for a product, guidance through a process. The answers stay yours.</p></div>
         </div>
     </div>
@@ -148,12 +123,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const progress = document.getElementById("progress");
     const progressBar = document.getElementById("progressBar");
     const exchange = document.getElementById("exchange");
-    const useOpenAI = document.getElementById("useOpenAI");
-    const keyBox = document.getElementById("openaiKey");
-    const keyInput = document.getElementById("openaiApiKey");
     const csrf = form.querySelector("[name=csrfmiddlewaretoken]").value;
-
-    useOpenAI.addEventListener("change", () => keyBox.classList.toggle("on", useOpenAI.checked));
 
     document.querySelectorAll(".suggest").forEach(b => b.addEventListener("click", () => {
         input.value = b.textContent;
@@ -190,33 +160,34 @@ document.addEventListener("DOMContentLoaded", function () {
         const question = input.value.trim();
         if (!question) return;
 
-        const openai = useOpenAI.checked && keyInput.value.trim() !== "";
         const data = new FormData();
         data.append("question", question);
-        if (openai) data.append("api_key", keyInput.value.trim());
 
-        // The local model is slow, so the bar creeps toward 90% and then crawls.
+        // Free models can queue, so the bar moves quickly to 90% and then crawls.
         let pct = 0;
         progressBar.style.width = "0%";
         setBusy(true);
         const timer = setInterval(() => {
-            pct += pct < 90 ? (openai ? 5 : 0.5) : (pct < 99 ? 0.1 : 0);
+            pct += pct < 90 ? 1.5 : (pct < 99 ? 0.05 : 0);
             progressBar.style.width = pct + "%";
         }, 100);
 
-        fetch(openai ? "{% url 'ask_question_openai' %}" : "{% url 'ask_question' %}", {
+        fetch("{% url 'ask_question' %}", {
             method: "POST",
             body: data,
             headers: { "X-CSRFToken": csrf, "X-Requested-With": "XMLHttpRequest" },
         })
-        .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then(r => r.json().catch(() => ({})).then(d => {
+            if (!r.ok) throw new Error(d.error || "Something went wrong. Please try again in a moment.");
+            return d;
+        }))
         .then(d => {
             if (d.last_answer) addEntry(question, d.last_answer, "answer", "Shown verbatim from the approved answers");
             else addEntry(question, "No approved answer covers this question, so none is shown.", "none", "Nothing invented");
             input.value = "";
         })
-        .catch(() => addEntry(question,
-            openai ? "Something went wrong. Make sure your OpenAI API key is correct." : "Something went wrong. Please try again in a moment.",
+        .catch(e => addEntry(question,
+            e.message && !e.message.startsWith("Failed to fetch") ? e.message : "Something went wrong. Please try again in a moment.",
             "err", "No answer shown"))
         .finally(() => {
             clearInterval(timer);

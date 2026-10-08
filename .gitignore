@@ -5,3 +5,4 @@ test.py
 *.gguf
 *dockertest
 *staticfiles/
+.env
