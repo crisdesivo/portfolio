@@ -1,67 +1,121 @@
-<!DOCTYPE html>
-<html>
+{% load static %}<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>{% block title %}Portfolio{% endblock %}</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bricklayer/0.4.2/bricklayer.min.css">
-    <script src="//cdnjs.cloudflare.com/ajax/libs/bricklayer/0.4.2/bricklayer.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Cristian Desivo{% endblock %}</title>
+    <meta name="description" content="{% block description %}Cristian Desivo — mathematician, AI engineer and project developer. AI systems that answer only from approved content, mathematical optimization, and complete software, built end to end.{% endblock %}">
+    <link rel="icon" sizes="16x16" href="{% static 'favicon.ico' %}" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
     <script type="module" src="https://md-block.verou.me/md-block.js"></script>
-
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
     <style>
-        @media screen and (min-width: 1200px) {
-            .bricklayer-column-sizer {
-                /* divide by 3. */
-                width: 33.3%;
-            }
-        }
+        :root { --bg:#FBF8F1; --paper:#FFFDF8; --ink:#1F2A44; --body:#2F3A52; --muted:#5D6474; --rule:#DCD6C8; --gold:#A8873E; --tint:#F3EEE2; --ok:#4E6B4F; --warn:#8A5A2B; }
+        * { box-sizing:border-box; margin:0; padding:0; }
+        body { background:var(--bg); color:var(--ink); font:19px/1.65 "EB Garamond", serif; }
+        a { color:inherit; }
+        .sans { font-family:"Source Sans 3", sans-serif; }
 
-        @media screen and (min-width: 768px) {
-            .bricklayer-column-sizer {
-                /* divide by 2. */
-                width: 50%;
-            }
-        }
+        /* top bar */
+        .top { border-bottom:1px solid var(--rule); font:500 13px/1 "Source Sans 3", sans-serif; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+        .top .in { max-width:1040px; margin:0 auto; padding:22px 32px; display:flex; justify-content:space-between; align-items:center; }
+        .top a { text-decoration:none; }
+        .top nav a { margin-left:28px; }
+        .top nav a.on, .top nav a.demo { color:var(--gold); }
+        main { max-width:1040px; margin:0 auto; padding:0 32px; }
 
-        #main-content {
-            margin-top: 20px;
-            margin-left: 10px;
-            margin-right: 10px;
-            max-width: 98%;
+        /* title block */
+        .title { text-align:center; padding:96px 0 56px; border-bottom:1px solid var(--rule); }
+        .kicker { font:600 12px/1.6 "Source Sans 3", sans-serif; letter-spacing:.24em; text-transform:uppercase; color:var(--gold); }
+        .nw { white-space:nowrap; }
+        .title h1 { font-weight:500; font-size:72px; line-height:1.05; margin:22px 0 14px; letter-spacing:-.01em; }
+        .title .sub { font-style:italic; font-size:24px; color:var(--muted); max-width:680px; margin:0 auto; }
+        .formula { margin:44px auto 0; display:inline-block; padding:18px 34px; border-top:1px solid var(--ink); border-bottom:1px solid var(--ink); font-size:22px; }
+        .abstract { max-width:680px; margin:56px auto 0; font-size:20px; text-align:left; }
+        .abstract b { font:600 13px/1 "Source Sans 3", sans-serif; letter-spacing:.16em; text-transform:uppercase; margin-right:10px; }
+
+        /* sections */
+        .row { display:grid; grid-template-columns:200px 1fr; gap:48px; padding:64px 0; border-bottom:1px solid var(--rule); }
+        .row h2 { font-weight:500; font-size:28px; line-height:1.2; }
+        .row h2 small { display:block; font:600 12px/1 "Source Sans 3", sans-serif; letter-spacing:.2em; color:var(--gold); margin-bottom:10px; }
+        .case { display:grid; grid-template-columns:1fr 200px; gap:40px; margin-bottom:34px; }
+        .case:last-child { margin-bottom:0; }
+        .case h3 { font-weight:600; font-size:22px; margin-bottom:4px; }
+        .case h3 a { text-decoration:none; }
+        .case p, .case md-block { color:var(--body); }
+        .note { font:14px/1.55 "Source Sans 3", sans-serif; color:var(--muted); border-left:2px solid var(--gold); padding-left:14px; align-self:start; margin-top:6px; }
+        .note a { color:var(--ink); }
+        figure img { width:100%; display:block; }
+        figcaption { font:14px/1.5 "Source Sans 3", sans-serif; color:var(--muted); margin-top:12px; }
+        figcaption b { color:var(--ink); }
+        .games { display:grid; grid-template-columns:1fr 1fr; gap:40px; }
+        .game img { width:100%; aspect-ratio:16/10; object-fit:cover; display:block; border:1px solid var(--rule); }
+        .game figcaption { margin-top:14px; font:inherit; color:inherit; }
+        .game .fig { font:600 12px/1 "Source Sans 3", sans-serif; letter-spacing:.14em; text-transform:uppercase; color:var(--gold); }
+        .game h3 { font-weight:600; font-size:22px; margin:8px 0 4px; }
+        .game h3 a, .game .more { text-decoration:none; }
+        .game p { font-size:17.5px; color:var(--body); }
+        .game .more { display:inline-block; margin-top:8px; font:14px/1.5 "Source Sans 3", sans-serif; color:var(--ink); border-bottom:1px solid var(--gold); }
+        .two { display:grid; grid-template-columns:1fr 1fr; gap:40px 48px; }
+        .two h3, .two h4 { font-weight:600; font-size:21px; margin-bottom:4px; }
+        .two p { font-size:17.5px; color:var(--body); }
+        .qa-teaser { background:var(--tint); padding:32px 36px; border:1px solid var(--rule); }
+        .qa-teaser .q { font-style:italic; color:var(--muted); }
+        .qa-teaser .a { font-size:22px; margin:8px 0 22px; }
+
+        /* buttons */
+        .btn { display:inline-block; font:600 14px/1 "Source Sans 3", sans-serif; letter-spacing:.06em; padding:14px 22px; background:var(--ink); color:var(--bg); text-decoration:none; border:1px solid var(--ink); cursor:pointer; }
+        .btn.ghost { background:none; color:var(--ink); margin-left:10px; }
+
+        /* rendered markdown (project pages) */
+        .prose { max-width:720px; }
+        .prose h1, .prose h2, .prose h3 { font-weight:500; line-height:1.25; margin:1.4em 0 .5em; }
+        .prose h1 { font-size:34px; } .prose h2 { font-size:28px; } .prose h3 { font-size:23px; }
+        .prose p, .prose ul, .prose ol { margin-bottom:1em; color:var(--body); }
+        .prose ul, .prose ol { padding-left:1.4em; }
+        .prose code { font-size:.85em; background:var(--tint); padding:1px 5px; }
+
+        footer { text-align:center; padding:80px 0 64px; }
+        footer .sig { font-style:italic; font-size:34px; }
+        footer .sig a { text-decoration:none; border-bottom:1px solid var(--gold); }
+        footer p { font:14px/1.6 "Source Sans 3", sans-serif; color:var(--muted); margin-top:18px; }
+        footer p a { text-decoration:none; border-bottom:1px solid var(--rule); }
+
+        @media (max-width:800px) {
+            main { padding:0 18px; }
+            .top .in { padding:18px; }
+            .top nav a { margin-left:16px; }
+            .top nav a.opt { display:none; }
+            .title { padding:56px 0 36px; }
+            .title h1 { font-size:44px; }
+            .title .sub { font-size:20px; }
+            .formula { font-size:16px; padding:14px 10px; }
+            .row, .case, .two { grid-template-columns:1fr; gap:16px; }
+            .games { grid-template-columns:1fr; gap:36px; }
+            .qa-teaser { padding:22px; }
+            .btn.ghost { margin:10px 0 0; }
+            footer .sig { font-size:24px; }
         }
     </style>
-    
-    {% load static %}
-    <link rel ="icon" sizes=16x16 href="{% static 'favicon.ico' %}" type="image/x-icon">
-
-
+    {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" href="/">Cristian Desivo</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <!-- link to hire_me -->
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'hire_me' %}">Hire me</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'ask_question' %}">Question Answering DEMO</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-    <!-- div container with margins -->
-    <div class="container-fluid" id="main-content">
+    <div class="top"><div class="in">
+        <a href="{% url 'home' %}">C. Desivo</a>
+        <nav>
+            <a class="opt" href="{% url 'home' %}#cases">Cases</a>
+            <a class="opt" href="{% url 'home' %}#methods">Methods</a>
+            <a href="{% url 'hire_me' %}"{% if request.resolver_match.url_name == 'hire_me' %} class="on"{% endif %}>Contact</a>
+            <a class="demo" href="{% url 'ask_question' %}">Demo</a>
+        </nav>
+    </div></div>
+    <main>
         {% block content %}{% endblock %}
-    </div>
+        <footer>
+            <div class="sig">{% block footer_line %}Correspondence:{% endblock %} <a href="mailto:cdesivo92@gmail.com">cdesivo92@gmail.com</a></div>
+            <p>Argentina (UTC−3) · English &amp; Spanish · Also on <a href="https://www.freelancer.com/affiliates/email/18225913/" target="_blank" rel="noopener noreferrer">Freelancer.com</a></p>
+        </footer>
+    </main>
 </body>
 </html>

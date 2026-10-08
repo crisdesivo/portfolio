@@ -1,13 +1,23 @@
 {% extends 'personal/base.html' %}
 
-{% block title %}My Portfolio{% endblock %}
+{% block title %}{{ project.title }} — Cristian Desivo{% endblock %}
+{% block description %}{{ project.description|truncatechars:155 }}{% endblock %}
 
 {% block content %}
-    <h1>{{ project.title }}</h1>
-    <md-block>{{ project.markdown }}</md-block>
-    {% if project.link %}
-        <a href="{{ project.link }}" class="btn btn-primary">View Project</a>
-    {% endif %}
+<div class="title">
+    <div class="kicker">Case</div>
+    <h1 style="font-size:52px">{{ project.title }}</h1>
+</div>
+
+<div class="row">
+    <h2><small>§</small><a href="{% url 'home' %}#cases" style="text-decoration:none">← All cases</a></h2>
+    <div>
+        <md-block class="prose">{{ project.markdown }}</md-block>
+        {% if project.link %}
+            <p style="margin-top:28px"><a class="btn" href="{{ project.link }}" target="_blank" rel="noopener noreferrer">View the project ↗</a></p>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}
 
-
+{% block footer_line %}Something similar in mind?{% endblock %}

@@ -1,26 +1,35 @@
 {% extends 'personal/base.html' %}
 
-{% block title %}Hire me{% endblock %}
+{% block title %}Contact — Cristian Desivo{% endblock %}
 
 {% block content %}
-<!-- div with top margin of 10 px -->
-<div style="margin-top: 50px;">
-    <a href="https://www.freelancer.com/affiliates/email/18225913/" target="_blank" rel="noopener noreferrer"><img src="https://cdn3.f-cdn.com/ppic/120595756/logo/18225913/profile_logo_18225913.jpg" style="float: left; margin-right: 20px; margin-bottom:10px; width:100px; max-height: 100px; border-radius: 50%;"></a>
-    <div style="min-height:40px;">
-        <a style="text-decoration: underline; font-weight: bold;" href="https://www.freelancer.com/affiliates/email/18225913/" target="_blank" rel="noopener noreferrer">Cristian Gustavo Desivo</a>
-        <p style="margin: 0;margin-bottom: 6px; white-space: nowrap;overflow: hidden">AI Expert ◆ Prompt Engineer ◆ Mathematician</p>
-        
-    </div>
-    <!-- div with horizontal layout -->
-    <div style="display: flex;flex-wrap: wrap;align-items: center;">
-        <!-- freelancer icon -->
-        <img src="https://www.freelancer.com/static/css/images/landingpage/hireme-widget-builder/fl-bird-icon.png" style="margin: 10px 0;">
-        <a href="https://www.freelancer.com/affiliates/email/18225913/" style="display: block;text-decoration: underline;margin: 10px 0 10px 10px;" target="_blank" rel="noopener noreferrer">Hire me on Freelancer.com</a>
-    </div>
-    <!-- div with horizontal layout -->
-    <div style="display: flex;flex-wrap: wrap;align-items: center;">        
-            <p><a href="mailto:cdesivo92@gmail.com" style="display: block;margin: 10px 0 10px 10px;"><i class="fa fa-envelope" style="font-size:28px;color:red"></i> Send email</a></p>
-    </div>
+<div class="title">
+    <div class="kicker">Contact</div>
+    <h1>Work with me</h1>
+    <p class="sub">Tell me about the problem. I'll tell you honestly whether I'm the right person for it, and how I'd approach it.</p>
+</div>
 
+<div class="row">
+    <h2><small>§ 1</small>How to reach me</h2>
+    <div class="two">
+        <div>
+            <h3>Email</h3>
+            <p><a href="mailto:cdesivo92@gmail.com">cdesivo92@gmail.com</a></p>
+            <p class="sans" style="font-size:14px;color:var(--muted);margin-top:6px">The fastest way. A few lines about what you need is enough to start.</p>
+        </div>
+        <div>
+            <h3>Freelancer.com</h3>
+            <p><a href="https://www.freelancer.com/affiliates/email/18225913/" target="_blank" rel="noopener noreferrer">Hire me on Freelancer.com ↗</a></p>
+            <p class="sans" style="font-size:14px;color:var(--muted);margin-top:6px">If you prefer the platform's contracts and payment protection.</p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <h2><small>§ 2</small>What to expect</h2>
+    <div class="two">
+        <div><h3>One person, the whole project</h3><p>Modeling, data, AI, code and delivery. You don't coordinate a team; you talk to the person doing the work.</p></div>
+        <div><h3>Time zone &amp; languages</h3><p>Based in Argentina (UTC−3), overlapping the US workday. English and Spanish.</p></div>
+    </div>
 </div>
 {% endblock %}

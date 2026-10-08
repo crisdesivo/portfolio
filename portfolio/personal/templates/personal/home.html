@@ -1,45 +1,84 @@
 {% extends 'personal/base.html' %}
+{% load static %}
 
-{% block title %}Cristian Desivo{% endblock %}
+{% block title %}Cristian Desivo — Mathematician · AI engineer · Project developer{% endblock %}
 
 {% block content %}
-<!-- disclaimer about website being a work in progress -->
-<div class="alert alert-warning" role="alert">
-    This website is a work in progress. Check back soon for more updates!
+<div class="title">
+    <div class="kicker"><span class="nw">Mathematician ·</span> <span class="nw">AI engineer ·</span> <span class="nw">Project developer</span></div>
+    <h1>Cristian Desivo</h1>
+    <div class="sub">On building systems that are correct, end to end.</div>
+    <div class="formula">{answers shown} &nbsp;⊆&nbsp; {answers approved}</div>
+    <p class="abstract"><b>Abstract</b>Since 2016 I have taken projects from a set of requirements to a working system: modeling the problem, building the data and models, writing the code and delivering it. My recent work focus on making language models useful in places where a wrong answer is not acceptable.</p>
 </div>
-    <!-- about me subtitle -->
-    <h1 class="my-4">Cristian Desivo</h1>
-    <a href="https://www.freelancer.com/affiliates/email/18225913/" target="_blank" rel="noopener noreferrer"><img src="https://cdn3.f-cdn.com/ppic/120595756/logo/18225913/profile_logo_18225913.jpg" style="float: left; margin-right: 20px; margin-bottom:10px; width:100px; max-height: 100px; border-radius: 50%;"></a>
 
-    <p class="lead">I'm a mathematician, a python expert and an AI developer. I've been working as a freelance developer since 2016, mastering the art of mathematical optimization, python and AI.</p>
-    
-    <p class="lead">Check out the summaries of some of the projects I've worked on below, send me an email at <a href="mailto:cdesivo92@gmail.com">cdesivo92@gmail.com</a>, or hire me on <a href="https://www.freelancer.com/affiliates/email/18225913/" target="_blank" rel="noopener noreferrer">freelancer.com</a></p>
-    <!-- <div class="row"> -->
-        <!-- <div class="col-lg-6"> -->
-            <a href="https://www.freelancer.com/affiliates/email/18225913/" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Hire me</a>
-        <!-- </div> -->
-    <!-- </div> -->
-
-    <!-- past projects as cards -->
-    <h1 class="my-4">Past projects</h1>
-    <div class="bricklayer">
+<div class="row" id="cases">
+    <h2><small>§ 1</small>Selected cases</h2>
+    <div>
+        <div class="case">
+            <div>
+                <h3><a href="{% url 'ask_question' %}">Constrained question answering</a></h3>
+                <p>An assistant whose every reply is drawn from a fixed set of pre-written answers. It cannot invent facts, and nothing can be injected into the prompt to change this, by design.</p>
+            </div>
+            <div class="note">Running live on this site. <a href="{% url 'ask_question' %}">Try it →</a></div>
+        </div>
         {% for project in projects %}
-            <!-- div of width 30% of screen -->
-                <div class="card bg-light mb-4 shadow-sm" style="width: 30%;">
-                    {% if project.image %}
-                        {% load static %}
-                        <img class="card-img-top" src="{% static project.image.url %}" alt="{{ project.title }}">
-                    {% endif %}
-                    <div class="card-body">
-                        <h4 class="card-title">{{ project.title }}</h4>
-                        <md-block class="card-text">{{ project.description }}</md-block>
-                        {% if project.link %}
-                            <a href="{{ project.link }}" class="btn btn-secondary">Visit Project Website</a>
-                        {% endif %}
-                        <a href="{% url 'project_detail' project.id %}" class="btn btn-primary">View Details</a>
-                    </div>
-                </div>
-            <!-- </div> -->
+        <div class="case">
+            <div>
+                <h3><a href="{% url 'project_detail' project.id %}">{{ project.title }}</a></h3>
+                <md-block>{{ project.description|truncatewords:30 }}</md-block>
+            </div>
+            <div class="note">
+                <a href="{% url 'project_detail' project.id %}">Read the case →</a>
+                {% if project.link %}<br><a href="{{ project.link }}" target="_blank" rel="noopener noreferrer">Project site ↗</a>{% endif %}
+            </div>
+        </div>
         {% endfor %}
     </div>
+</div>
+
+<div class="row" id="games">
+    <h2><small>§ 2</small>Games of my own</h2>
+    <div class="games">
+        <figure class="game">
+            <a href="https://store.steampowered.com/app/2448910/Pixel_PI/" target="_blank" rel="noopener noreferrer"><img src="{% static 'personal/img/pixel_pi_interview.jpg' %}" alt="Pixel P.I.: the interview database, where a typed question unlocks a suspect's statement"></a>
+            <figcaption>
+                <span class="fig">Fig. 1 · Steam · Early Access</span>
+                <h3><a href="https://store.steampowered.com/app/2448910/Pixel_PI/" target="_blank" rel="noopener noreferrer">Pixel P.I.</a></h3>
+                <p>A detective game I make as a solo developer. Players type their own questions; a statement unlocks when the question matches what the police asked.</p>
+                <a class="more" href="https://store.steampowered.com/app/2448910/Pixel_PI/" target="_blank" rel="noopener noreferrer">View on Steam ↗</a>
+            </figcaption>
+        </figure>
+        <figure class="game">
+            <a href="https://crischu.itch.io/murder-in-the-aethertree-forest" target="_blank" rel="noopener noreferrer"><img class="aether" src="{% static 'personal/img/aethertree_temple.jpg' %}" alt="Murder in the Aethertree Forest: the boarded-up temple outside town"></a>
+            <figcaption>
+                <span class="fig">Fig. 2 · itch.io · Free</span>
+                <h3><a href="https://crischu.itch.io/murder-in-the-aethertree-forest" target="_blank" rel="noopener noreferrer">Murder in the Aethertree Forest</a></h3>
+                <p>A supernatural murder-mystery visual novel, made in one month for the Spooktober Visual Novel Jam.</p>
+                <a class="more" href="https://crischu.itch.io/murder-in-the-aethertree-forest" target="_blank" rel="noopener noreferrer">Play on itch.io ↗</a>
+            </figcaption>
+        </figure>
+    </div>
+</div>
+
+<div class="row" id="methods">
+    <h2><small>§ 3</small>Methods</h2>
+    <div class="two">
+        <div><h3>Reliable AI systems</h3><p>Retrieval, agents and structured outputs, bounded to approved content.</p></div>
+        <div><h3>Mathematical optimization</h3><p>Operations research, non-linear optimization, metaheuristics.</p></div>
+        <div><h3>Deep learning</h3><p>Datasets, training and deployment, computer vision.</p></div>
+        <div><h3>Local inference</h3><p>llama.cpp, vLLM, Ollama; choosing and quantizing models.</p></div>
+        <div><h3>Games</h3><p>Unity, Godot and Ren'Py.</p></div>
+        <div><h3>Python, thoroughly</h3><p>Django, Flask, FastAPI, NumPy, PyTorch, PyQt and more.</p></div>
+    </div>
+</div>
+
+<div class="row">
+    <h2><small>Appendix A</small>Ask me anything</h2>
+    <div class="qa-teaser">
+        <div class="q">“Who are you?”</div>
+        <div class="a">I am Cristian Desivo, a mathematician and software developer. I work as a freelancer.</div>
+        <a class="btn" href="{% url 'ask_question' %}">Open the demo</a><a class="btn ghost" href="mailto:cdesivo92@gmail.com">Write to me</a>
+    </div>
+</div>
 {% endblock %}

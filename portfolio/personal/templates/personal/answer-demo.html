@@ -1,289 +1,229 @@
 {% extends 'personal/base.html' %}
 
-{% block title %}Question Answering Demo{% endblock %}
+{% block title %}Ask me anything — Cristian Desivo{% endblock %}
+{% block description %}A question-answering demo that may only reply with answers Cristian wrote. When none fits, it says nothing rather than invent one.{% endblock %}
 
-{% block content %}
+{% block extra_head %}
 <style>
-    #QAnswer {
-        opacity: 0;
-        animation: fadeIn 1s forwards;
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-        }
-        to {
-            opacity: 1;
-        }
+    .title { padding:72px 0 44px; }
+    .title h1 { font-size:56px; line-height:1.1; margin:18px 0 12px; }
+    .title .sub { font-size:22px; }
+    .formula { margin-top:34px; padding:14px 30px; font-size:21px; }
+    .layout { display:grid; grid-template-columns:1fr 250px; gap:56px; padding:56px 0 24px; }
+    .ask { background:var(--paper); border:1px solid var(--rule); padding:36px 40px 32px; }
+    .ask label.lab { display:block; font:600 12px/1 "Source Sans 3", sans-serif; letter-spacing:.18em; text-transform:uppercase; color:var(--muted); margin-bottom:14px; }
+    .field { display:flex; border-bottom:2px solid var(--ink); }
+    .field input { flex:1; min-width:0; border:0; background:none; font:italic 24px/1.4 "EB Garamond", serif; color:var(--ink); padding:8px 0; outline:none; }
+    .field input::placeholder { color:#9AA0AC; }
+    .field button { border:0; background:var(--ink); color:var(--bg); font:600 14px/1 "Source Sans 3", sans-serif; letter-spacing:.06em; padding:0 22px; cursor:pointer; }
+    .field button:disabled, .field input:disabled { opacity:.5; cursor:wait; }
+    .try { margin-top:14px; font:14px/1.9 "Source Sans 3", sans-serif; color:var(--muted); }
+    .try button { font:inherit; color:var(--ink); background:none; border:0; border-bottom:1px dotted var(--gold); margin-right:14px; cursor:pointer; padding:0; }
+    .progress { margin-top:26px; font:13px/1 "Source Sans 3", sans-serif; color:var(--muted); display:none; align-items:center; gap:14px; }
+    .progress.on { display:flex; }
+    .bar { flex:1; height:2px; background:var(--rule); position:relative; }
+    .bar i { position:absolute; left:0; top:0; bottom:0; width:0; background:var(--gold); transition:width .1s linear; }
+    .exchange { margin-top:34px; border-top:1px solid var(--rule); }
+    .exchange:empty { display:none; }
+    .qa { padding:26px 0 24px; border-bottom:1px solid var(--rule); animation:fade .6s ease both; }
+    @keyframes fade { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:none; } }
+    .qa .q { font-style:italic; color:var(--muted); font-size:20px; }
+    .qa .a { font-size:24px; line-height:1.5; margin-top:10px; }
+    .qa b.m { font:600 12px/1 "Source Sans 3", sans-serif; letter-spacing:.18em; color:var(--gold); margin-right:10px; font-style:normal; vertical-align:middle; }
+    .qa .src { margin-top:12px; font:13px/1.4 "Source Sans 3", sans-serif; color:var(--ok); display:flex; align-items:center; gap:8px; }
+    .qa .src:before { content:""; width:14px; height:14px; border:1.5px solid currentColor; border-radius:50%; display:inline-block; background:radial-gradient(circle, currentColor 35%, transparent 40%); }
+    .qa.none .a, .qa.err .a { font-style:italic; color:var(--muted); font-size:21px; }
+    .qa.none .src, .qa.err .src { color:var(--warn); }
+    .qa.none .src:before, .qa.err .src:before { background:none; }
+    .adv { margin-top:26px; font:15px/1.5 "Source Sans 3", sans-serif; color:var(--muted); }
+    .adv summary { cursor:pointer; color:var(--ink); font-weight:500; list-style:none; }
+    .adv summary::-webkit-details-marker { display:none; }
+    .adv summary:before { content:"+ "; color:var(--gold); }
+    .adv[open] summary:before { content:"− "; }
+    .adv .box { margin-top:14px; padding:18px 20px; background:var(--tint); border:1px solid var(--rule); }
+    .switch { display:flex; align-items:center; gap:10px; color:var(--ink); cursor:pointer; }
+    .switch input { appearance:none; width:34px; height:18px; border-radius:9px; background:#B9BDC6; position:relative; cursor:pointer; transition:background .2s; }
+    .switch input:after { content:""; position:absolute; left:2px; top:2px; width:14px; height:14px; border-radius:50%; background:var(--bg); transition:left .2s; }
+    .switch input:checked { background:var(--ink); }
+    .switch input:checked:after { left:18px; }
+    .key { display:none; margin-top:12px; }
+    .key.on { display:block; }
+    .key input { width:100%; border:1px solid var(--rule); background:var(--paper); padding:10px 12px; font:14px "Source Sans 3", sans-serif; }
+    .key small { display:block; margin-top:8px; font-size:13px; }
+    aside.notes { font:14.5px/1.6 "Source Sans 3", sans-serif; color:var(--muted); }
+    aside.notes h3 { font:600 12px/1 "Source Sans 3", sans-serif; letter-spacing:.18em; text-transform:uppercase; color:var(--ink); margin-bottom:16px; }
+    aside .note { font-size:14.5px; margin:0 0 22px; }
+    aside .note b { display:block; color:var(--ink); font-weight:600; margin-bottom:2px; }
+    .topics { list-style:none; margin-top:6px; }
+    .topics li { padding:4px 0; border-bottom:1px dotted var(--rule); }
+    .steps { counter-reset:s; display:grid; grid-template-columns:repeat(3,1fr); gap:28px; }
+    .steps div { counter-increment:s; }
+    .steps div:before { content:counter(s, lower-roman) "."; font-style:italic; color:var(--gold); font-size:22px; }
+    .steps h4 { font-weight:600; font-size:20px; margin:4px 0; }
+    .steps p { font-size:17px; color:var(--body); }
+    .faq { margin-top:34px; }
+    @media (max-width:800px) {
+        .title h1 { font-size:38px; }
+        .formula { font-size:15px; padding:12px 6px; }
+        .layout { grid-template-columns:1fr; gap:28px; }
+        .ask { padding:22px 18px; }
+        .field input { font-size:19px; }
+        .qa .a { font-size:20px; }
+        .steps { grid-template-columns:1fr; }
     }
 </style>
+{% endblock %}
 
-<div class="container-fluid mt-5">
-    <div class="row">
-        <!-- Sidebar for premade questions -->
-        
-        <div class="col-md-3">
-            <div class="card">
-                <div class="card-header">
-                    <h4>About This Demo</h4>
-                </div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item">
-                        <a href="#" onclick="showAnswer('answer1')">What is this?</a>
-                        <p id="answer1" class="mt-2" style="display: none;">This is a Question Answering demo app using a Large Language Model hosted on Google Cloud Run. It showcases a retrieval system designed by me. It will retrieve the most fitting answer from a premade FAQ about me.</p>
-                    </li>
-                    <li class="list-group-item">
-                        <a href="#" onclick="showAnswer('answer3')">What should I ask?</a>
-                        <p id="answer3" class="mt-2" style="display: none;">The FAQ contains information about who I am, what I do for work, my areas of expertise, and the frameworks I use. Try asking for instance "What kind of work do you do?".</p>
-                    </li>
-                    <li class="list-group-item">
-                        <a href="#" onclick="showAnswer('answer2')">How does it work?</a>
-                        <p id="answer2" class="mt-2" style="display: none;">The LLM is asked to retrieve the most fitting answer, and it's constrained to only provide answers from the list.</p>
-                    </li>
-                    <li class="list-group-item">
-                        <a href="#" onclick="showAnswer('answer5')">What are its advantages over a normal chatbot?</a>
-                        <p id="answer5" class="mt-2" style="display: none;">With this method you can completely forget about hallucinations; a LLM by default will often provide answers that are plainly wrong. It WILL make up facts, even when shown the correct data. This method takes a step back, takes some control away from the LLM and forces it to provide a pre-written answer.
-                        It also completely solves prompt injection hacking. In a normal chatbot a user could inject a prompt that would make the LLM say anything, or even target other modules connected to the chatbot. By constraining the response of the chatbot to a list of pre-written answers, this attack vector is completely eliminated.
-                        </p>
-                    </li>
-                    <li class="list-group-item">
-                        <a href="#" onclick="showAnswer('answer6')">Why am I still getting wrong answers?</a>
-                        <p id="answer6" class="mt-2" style="display: none;">The model used for this demo is a 1.5 billion parameter models, 300x smaller than the largest models available. As such, it is not as accurate as the larger models. According to my experiments a 9b parameter model would be ideal (but it's too slow for this demo). If you have an openai api key you can try it with gpt4o-mini by toggling the option on the right.</p>
-                    </li>
-                    <li class="list-group-item">
-                        <a href="#" onclick="showAnswer('answer7')">What's the recommended setup for this tool?</a>
-                        <p id="answer7" class="mt-2" style="display: none;">This runs perfectly with gpt4o-mini. Answers are immediate and 100% accurate in all the tests I've performed.</p>
-                    </li>
-                    <li class="list-group-item">
-                        <a href="#" onclick="showAnswer('answer8')">What can this be used for?</a>
-                        <p id="answer8" class="mt-2" style="display: none;">This can be integrated in a chatbot to accurately answer specific questions the user may have in the middle of the conversation. For example, this could be used in a chatbot on a business website, to make sure questions about the business are not answered incorrecly.</p>
-                    </li>
-                </ul>
+{% block content %}
+<div class="title">
+    <div class="kicker">Appendix A · Live demonstration</div>
+    <h1>Ask me anything</h1>
+    <p class="sub">An assistant that may only reply with answers I wrote. When none of them fits, it says nothing rather than invent one.</p>
+    <div class="formula">{answers shown} &nbsp;⊆&nbsp; {answers approved}</div>
+</div>
+
+<div class="layout">
+    <div>
+        <form class="ask" id="questionForm" method="post" autocomplete="off">
+            {% csrf_token %}
+            <label class="lab" for="question">Your question</label>
+            <div class="field">
+                <input type="text" id="question" name="question" placeholder="e.g. What kind of jobs do you take?" required>
+                <button type="submit" id="askButton">Ask</button>
             </div>
+            <div class="try">Try:
+                <button type="button" class="suggest">Who are you?</button>
+                <button type="button" class="suggest">What is mathematical optimization?</button>
+                <button type="button" class="suggest">Which Python frameworks do you use?</button>
+            </div>
+
+            <div class="progress" id="progress"><span>Choosing among approved answers…</span><div class="bar"><i id="progressBar"></i></div></div>
+
+            <div class="exchange" id="exchange"></div>
+
+            <details class="adv">
+                <summary>Advanced: run it with a larger model</summary>
+                <div class="box">
+                    <label class="switch"><input type="checkbox" id="useOpenAI"> Use the OpenAI API (gpt-4o-mini)</label>
+                    <div class="key" id="openaiKey">
+                        <input type="password" id="openaiApiKey" placeholder="Your OpenAI API key">
+                        <small>Your key is used for this question only. It is never stored.</small>
+                    </div>
+                </div>
+            </details>
+        </form>
+    </div>
+
+    <aside class="notes">
+        <h3>Notes</h3>
+        <div class="note"><b>What is this?</b>A question-answering demo using a language model, built on a retrieval system I designed. It picks the most fitting answer from a pre-written FAQ about me.</div>
+        <div class="note"><b>Why no hallucinations?</b>The model chooses; it never writes. Every answer you see was written by me in advance.</div>
+        <div class="note"><b>Why no prompt injection?</b>There is no free-form output to hijack. The worst a malicious prompt can do is read the wrong approved answer.</div>
+        <div class="note"><b>Topics covered</b>
+            <ul class="topics"><li>Who I am</li><li>The work I take on</li><li>Optimization &amp; AI development</li><li>Languages &amp; frameworks</li></ul>
         </div>
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h3>Question Answering Demo</h3>
-                </div>
-                <div class="card-body">
-                    <p class="card-text" id="QQuestion"><strong>Question:</strong> {{ last_question }}</p>
-                    <p class="card-text" id="QAnswer"><strong>Answer:</strong> {{ last_answer }}</p>
-                    <form id="questionForm" method="post">
-                        {% csrf_token %}
-                        <div class="form-group">
-                            <label for="question">Ask me (Cristian) a Question:</label>
-                            <input type="text" class="form-control" id="question" name="question" placeholder="Type your question here...">
-                        </div>
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </form>
-                    <!-- Progress bar -->
-                    <div id="progressContainer" class="mt-3" style="display: none; width: 100%;">
-                        <!-- progress bar label -->
-                        <p>Processing...</p>
+    </aside>
+</div>
 
-                        <div class="progress">
-                            <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
-                                role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                                0%
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="alert alert-success" id="success" role="alert" style="margin: 10px; display: none;">
-                        <strong>Success!</strong> The answer is ready.
-                    </div>
-
-                    <div class="alert alert-danger" id="error" role="alert" style="margin: 10px; display: none;">
-                        <strong>Error:</strong> <p id="error-message"></p>
-                    </div>
-                </div>
-            </div>
+<div class="row">
+    <h2><small>§ A.1</small>How it works</h2>
+    <div>
+        <div class="steps">
+            <div><h4>Question</h4><p>You type anything, in your own words.</p></div>
+            <div><h4>Selection</h4><p>The model reads the approved question-and-answer pairs. Its output is constrained to one of them, plus a yes/no: does it really answer you? If not, nothing is shown.</p></div>
+            <div><h4>Answer</h4><p>The chosen answer is shown exactly as written. Nothing is generated.</p></div>
         </div>
-        <div class="col-md-3">
-            <div class="card">
-                <div class="card-header">
-                    <h4>Advanced Options</h4>
-                    
-                    <div class="card-body">
-                        <!-- Checkbox input to toggle OpenAI API key field -->
-                        <div class="form-check mb-3">
-                            <input class="form-check-input" type="checkbox" id="useOpenAI" autocomplete="off">
-                            <label class="form-check-label" for="useOpenAI">Use OpenAI API</label>
-                        </div>
-                    
-                        <!-- OpenAI API key input field (initially hidden) -->
-                        <div class="form-group" id="openaiKey" style="display: none;">
-                            <label for="openaiApiKey">OpenAI API Key:</label>
-                            <input type="text" class="form-control" id="openaiApiKey" name="openaiApiKey" placeholder="Enter your OpenAI API key...">
-                            <div class="alert alert-warning" role="alert">Your API key will not be stored or saved in any way. It will only be used to answer this question.</div>
-                        </div>
-                    </div>
-                                 
-                </div>
-            </div>
+        <div class="two faq">
+            <div><h4>Why am I still getting wrong answers?</h4><p>This demo runs a 1.5-billion-parameter model so it can be hosted cheaply; it sometimes picks a less fitting answer. A larger model, such as gpt-4o-mini, picks reliably.</p></div>
+            <div><h4>Where is this useful?</h4><p>Anywhere a wrong answer is costly: a business website's assistant, support for a product, guidance through a process. The answers stay yours.</p></div>
         </div>
     </div>
 </div>
+
 <script>
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("questionForm");
+    const input = document.getElementById("question");
+    const askButton = document.getElementById("askButton");
+    const progress = document.getElementById("progress");
+    const progressBar = document.getElementById("progressBar");
+    const exchange = document.getElementById("exchange");
+    const useOpenAI = document.getElementById("useOpenAI");
+    const keyBox = document.getElementById("openaiKey");
+    const keyInput = document.getElementById("openaiApiKey");
+    const csrf = form.querySelector("[name=csrfmiddlewaretoken]").value;
 
-    document.getElementById('useOpenAI').addEventListener('change', function() {
-        const openaiKeyDiv = document.getElementById('openaiKey');
-        openaiKeyDiv.style.display = this.checked ? 'block' : 'none';
-    });
+    useOpenAI.addEventListener("change", () => keyBox.classList.toggle("on", useOpenAI.checked));
 
+    document.querySelectorAll(".suggest").forEach(b => b.addEventListener("click", () => {
+        input.value = b.textContent;
+        form.requestSubmit();
+    }));
 
-    function showAnswer(answerId) {
-        // Select the answer element
-        const answerElement = document.getElementById(answerId);
-        
-        // Toggle display: if the answer is visible, hide it; otherwise, show it
-        if (answerElement.style.display === "block") {
-            answerElement.style.display = "none";
-        } else {
-            // Hide other answers
-            document.querySelectorAll(".list-group-item p").forEach(answer => {
-                answer.style.display = "none";
-            });
-            // Show the selected answer
-            answerElement.style.display = "block";
-        }
+    // Build one Q/A entry with textContent only, so user input is never parsed as HTML.
+    function addEntry(question, answer, kind, sourceText) {
+        const entry = document.createElement("div");
+        entry.className = "qa" + (kind === "answer" ? "" : " " + kind);
+        const q = document.createElement("div");
+        q.className = "q";
+        q.innerHTML = '<b class="m">Q.</b>';
+        q.append(question);
+        const a = document.createElement("div");
+        a.className = "a";
+        if (kind === "answer") a.innerHTML = '<b class="m">A.</b>';
+        a.append(answer);
+        const src = document.createElement("div");
+        src.className = "src";
+        src.textContent = sourceText;
+        entry.append(q, a, src);
+        exchange.prepend(entry);
     }
 
-    document.addEventListener("DOMContentLoaded", function() {
-        const form = document.getElementById("questionForm");
-        const progressContainer = document.getElementById("progressContainer");
-        const progressBar = document.getElementById("progressBar");
-        const questionInput = document.getElementById("question");
-        const submitButton = form.querySelector("button[type='submit']");
-        const answerText = document.getElementById("QAnswer");
-        const questionText = document.getElementById("QQuestion");
-        const successAlert = document.getElementById("success");
-        const errorAlert = document.getElementById("error");
-        const errorMessage = document.getElementById("error-message");
-        const openaiCheckbox = document.getElementById("useOpenAI");
-        const openaiKeyInput = document.getElementById("openaiApiKey");
+    function setBusy(busy) {
+        input.disabled = busy;
+        askButton.disabled = busy;
+        progress.classList.toggle("on", busy);
+    }
 
-        form.addEventListener("submit", function(event) {
-            questionText.innerHTML = `<strong>Question:</strong> ${questionInput.value}`;
-            answerText.innerHTML = "<strong>Answer:</strong> Processing...";
-            // set the background of the answer to white
-            answerText.style.backgroundColor = "white";
-            event.preventDefault(); // Prevent default form submission
+    form.addEventListener("submit", function (event) {
+        event.preventDefault();
+        const question = input.value.trim();
+        if (!question) return;
 
-            // Show the progress bar and lock input
-            progressContainer.style.display = "block";
-            questionInput.disabled = true;
-            submitButton.disabled = true;
+        const openai = useOpenAI.checked && keyInput.value.trim() !== "";
+        const data = new FormData();
+        data.append("question", question);
+        if (openai) data.append("api_key", keyInput.value.trim());
 
+        // The local model is slow, so the bar creeps toward 90% and then crawls.
+        let pct = 0;
+        progressBar.style.width = "0%";
+        setBusy(true);
+        const timer = setInterval(() => {
+            pct += pct < 90 ? (openai ? 5 : 0.5) : (pct < 99 ? 0.1 : 0);
+            progressBar.style.width = pct + "%";
+        }, 100);
 
-            // Send the form data with AJAX
-            const formData = new FormData(form);
-            formData.append("question", questionInput.value);
-
-            questionInput.value = ""; // Clear input
-            successAlert.style.display = "none";
-            errorAlert.style.display = "none";
-            var action = "{% url 'ask_question' %}";
-            // check if the OpenAI checkbox is checked
-            console.log(openaiCheckbox.checked);
-            console.log(openaiKeyInput.value);
-            if (openaiCheckbox.checked && openaiKeyInput.value) {
-                action = "{% url 'ask_question_openai' %}";
-                console.log(action)
-                formData.append("api_key", openaiKeyInput.value);
-            }
-
-            // Start the progress bar animation
-            let progress = 0;
-            const progressInterval = setInterval(function() {
-                if (progress < 90) {
-                    progress += (openaiCheckbox.checked && openaiKeyInput.value) ? 5 : 0.5;
-                    progressBar.style.width = progress + "%";
-                    progressBar.setAttribute("aria-valuenow", progress);
-                    progressBar.textContent = Math.floor(progress) + "%";
-                } else if (progress < 99) {
-                    progress += 0.1;
-                    progressBar.style.width = progress + "%";
-                    progressBar.setAttribute("aria-valuenow", progress);
-                    progressBar.textContent = Math.floor(progress) + "%";
-                } else {
-                    clearInterval(progressInterval); // Stop at 90%
-                }
-            }, 100);
-
-            fetch(action, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest' // Ensures Django treats it as an AJAX request
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                clearInterval(progressInterval); // Stop progress bar animation
-                progressBar.style.width = "100%";
-                progressBar.setAttribute("aria-valuenow", 100);
-                progressBar.textContent = "100%";
-
-                // Update answer in the DOM
-                if (data.error) {
-                    // answerText.innerHTML = `<strong>Error:</strong> ${data.error}`;
-                    errorMessage.textContent = data.error;
-                    if (openaiCheckbox.checked && openaiKeyInput.value) {
-                        errorMessage.textContent += " Make sure your OpenAI API key is correct.";
-                    }
-                    errorAlert.style.display = "block";
-                } else {
-                    if (data.last_answer != "")
-                    {
-                        answerText.innerHTML = `<strong>Answer:</strong> ${data.last_answer}`;
-                        successAlert.style.display = "block";
-                        // set the background of the answer to light green
-                        answerText.style.backgroundColor = "#d4edda";
-                    }
-                    else {
-                        answerText.innerHTML = "No answer found.";
-                        // set the background of the answer to yellow
-                        answerText.style.backgroundColor = "#fff3cd";
-                    }
-                }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                answerText.innerHTML = "<strong>Error:</strong> An error occurred.";
-                if (openaiCheckbox.checked && openaiKeyInput.value) {
-                    answerText.innerHTML += " Make sure your OpenAI API key is correct.";
-                }
-            })
-            .finally(() => {
-                // Reset progress bar and unlock input
-                setTimeout(() => {
-                    progressContainer.style.display = "none";
-                    questionInput.disabled = false;
-                    submitButton.disabled = false;
-                    progressBar.style.width = "0%";
-                    progressBar.setAttribute("aria-valuenow", 0);
-                    progressBar.textContent = "0%";
-                }, 1000);
-            });
-        });
-        
-        // Reset progress bar on page load
-        window.addEventListener("pageshow", function() {
-            successAlert.style.display = "none";
-            errorAlert.style.display = "none";
-            progressContainer.style.display = "none";
-            questionInput.disabled = false;
-            submitButton.disabled = false;
-            progressBar.style.width = "0%";
-            progressBar.setAttribute("aria-valuenow", 0);
-            progressBar.textContent = "0%";
+        fetch(openai ? "{% url 'ask_question_openai' %}" : "{% url 'ask_question' %}", {
+            method: "POST",
+            body: data,
+            headers: { "X-CSRFToken": csrf, "X-Requested-With": "XMLHttpRequest" },
+        })
+        .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+        .then(d => {
+            if (d.last_answer) addEntry(question, d.last_answer, "answer", "Shown verbatim from the approved answers");
+            else addEntry(question, "No approved answer covers this question, so none is shown.", "none", "Nothing invented");
+            input.value = "";
+        })
+        .catch(() => addEntry(question,
+            openai ? "Something went wrong. Make sure your OpenAI API key is correct." : "Something went wrong. Please try again in a moment.",
+            "err", "No answer shown"))
+        .finally(() => {
+            clearInterval(timer);
+            progressBar.style.width = "100%";
+            setTimeout(() => { setBusy(false); input.focus(); }, 400);
         });
     });
+});
 </script>
-
-
-
 {% endblock %}
